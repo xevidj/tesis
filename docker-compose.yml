@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  express:
+    container_name: server
+    image: server
+    build:
+      context: .
+      args:
+        PORT: $PORT
+    restart: unless-stopped
+    environment:
+      APP_MONGO_USER: $APP_MONGO_USER
+      APP_MONGO_PASS: $APP_MONGO_PASS
+      APP_MONGO_DB: $APP_MONGO_DB
+      PORT: $PORT
+      NODE_ENV: production
+    ports:
+      - "80:$PORT"
+
+  mongo:
+    image: mongo
+    container_name: database
+    restart: unless-stopped
+    expose:
+      - 27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGO_ROOT_USERNAME
+      MONGO_INITDB_ROOT_PASSWORD: $MONGO_ROOT_PASSWORD
+      MONGO_ROOT_USER: $MONGO_ROOT_USERNAME
+      MONGO_ROOT_PASS: $MONGO_ROOT_PASSWORD
+      APP_MONGO_USER: $APP_MONGO_USER
+      APP_MONGO_PASS: $APP_MONGO_PASS
+      APP_MONGO_DB: $APP_MONGO_DB
+    volumes:
+      - mongo:/data/db/
+      - ./docker_scripts/:/docker-entrypoint-initdb.d/
+
+volumes:
+  mongo:
